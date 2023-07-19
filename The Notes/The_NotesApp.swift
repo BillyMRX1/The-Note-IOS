@@ -9,9 +9,16 @@ import SwiftUI
 
 @main
 struct The_NotesApp: App {
+    
+    @StateObject var noteViewModel: NoteViewModel = NoteViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                NoteListView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .environmentObject(noteViewModel)
         }
     }
 }
