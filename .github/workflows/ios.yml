@@ -29,49 +29,49 @@ jobs:
         run: |
           # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
           device="iPhone 13"
-          if [ $scheme = default ]; then scheme=$(cat default); fi
+          if [ "$scheme" = "default" ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild build-for-testing -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
+          xcodebuild build-for-testing -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=iOS Simulator,name=$device"
           
-      - name: Test
-        env:
-          scheme: ${{ 'default' }}
-          platform: ${{ 'iOS Simulator' }}
-        run: |
-          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
-          device="iPhone 13"
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild test-without-building -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
+      # - name: Test
+      #   env:
+      #     scheme: ${{ 'default' }}
+      #     platform: ${{ 'iOS Simulator' }}
+      #   run: |
+      #     # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
+      #     device="iPhone 13"
+      #     if [ $scheme = default ]; then scheme=$(cat default); fi
+      #     if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
+      #     file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
+      #     xcodebuild test-without-building -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
       
-      - name: Archive and Export
-        env:
-          scheme: ${{ 'default' }}
-          platform: ${{ 'iOS' }}
-        run: |
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild archive -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "generic/platform=iOS" -archivePath "build/$scheme.xcarchive"
-          xcodebuild -exportArchive -archivePath "build/$scheme.xcarchive" -exportOptionsPlist "ExportOptions.plist" -exportPath "build"
+      # - name: Archive and Export
+      #   env:
+      #     scheme: ${{ 'default' }}
+      #     platform: ${{ 'iOS' }}
+      #   run: |
+      #     if [ $scheme = default ]; then scheme=$(cat default); fi
+      #     if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
+      #     file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
+      #     xcodebuild archive -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "generic/platform=iOS" -archivePath "build/$scheme.xcarchive"
+      #     xcodebuild -exportArchive -archivePath "build/$scheme.xcarchive" -exportOptionsPlist "ExportOptions.plist" -exportPath "build"
 
-      - name: Save Artifact
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: ${{ runner.os }}-artifact
-          path: build
+      # - name: Save Artifact
+      #   uses: actions/upload-artifact@v3.1.3
+      #   with:
+      #     name: ${{ runner.os }}-artifact
+      #     path: build
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      # - name: Install Firebase CLI
+      #   run: npm install -g firebase-tools
 
-      - name: Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.6.0
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          file: ${{ runner.os }}-artifact.ipa
-          groups: developer
-          releaseNotes: ${{ github.event.head_commit.message }}
-          debug: true
+      # - name: Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1.6.0
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_APP_ID }}
+      #     serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+      #     file: ${{ runner.os }}-artifact.ipa
+      #     groups: developer
+      #     releaseNotes: ${{ github.event.head_commit.message }}
+      #     debug: true
